@@ -45,8 +45,8 @@
 
 ## Execution Steps 
 
-The project can be run directly as a script which in turns opens a GUI 
-Refer to step 3 to convert it to .exe
+The project can be run directly as a script which in turn opens a GUI 
+Refer to step 2 to convert it to .exe
 
 1. **Run the Main Script**:
 
