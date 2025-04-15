@@ -20,10 +20,10 @@ class SelectiveRepeatSimulator:
         self.root = root
         self.root.title("Selective Repeat Protocol Simulation")
 
-        top_sentence = tk.Label(root, text="Selective Repeat Protocol Simulation", font=("Arial", 12))
+        top_sentence = tk.Label(root, text="Selective Repeat Protocol Simulation", font=("Arial", 16))
         top_sentence.pack(pady=2)
 
-        self.canvas = tk.Canvas(root, width=1400, height=400, bg="white")
+        self.canvas = tk.Canvas(root, width=1400, height=500, bg="white")
         self.canvas.pack()
 
         layout_frame = tk.Frame(root)
