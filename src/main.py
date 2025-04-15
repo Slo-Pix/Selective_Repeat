@@ -20,7 +20,10 @@ class SelectiveRepeatSimulator:
         self.root = root
         self.root.title("Selective Repeat Protocol Simulation")
 
-        self.canvas = tk.Canvas(root, width=1500, height=500, bg="white")
+        top_sentence = tk.Label(root, text="Selective Repeat Protocol Simulation", font=("Arial", 14))
+        top_sentence.pack(pady=2)
+
+        self.canvas = tk.Canvas(root, width=1400, height=500, bg="white")
         self.canvas.pack()
 
         layout_frame = tk.Frame(root)
@@ -90,23 +93,23 @@ class SelectiveRepeatSimulator:
         self.acked_packets = set()
         self.timeout_labels = {}
         self.pending_timeout_retransmit = set()
-        self.packets_in_transit = set()    # Track packets currently in transit
-        self.processed_packets = set()    # Track packets that have been processed
-        self.received_out_of_order = set()    # Track out-of-order packets
-        self.timeout_label_x = 1300    # X position for timeout labels
-        self.timeout_label_y = 20    # Initial Y position
-        self.timeout_label_spacing = 20    # Vertical spacing between timeout labels
-        self.receiver_packet_objects = {}    # Track packets at receiver
-        self.retransmission_queue = Queue()    # Queue for packets waiting to be retransmitted
-        self.animation_in_progress = False    # Track if an animation is in progress
+        self.packets_in_transit = set()        # Track packets currently in transit
+        self.processed_packets = set()        # Track packets that have been processed
+        self.received_out_of_order = set()        # Track out-of-order packets
+        self.timeout_label_x = 1300        # X position for timeout labels
+        self.timeout_label_y = 20        # Initial Y position
+        self.timeout_label_spacing = 20        # Vertical spacing between timeout labels
+        self.receiver_packet_objects = {}        # Track packets at receiver
+        self.retransmission_queue = Queue()        # Queue for packets waiting to be retransmitted
+        self.animation_in_progress = False        # Track if an animation is in progress
         self.nack_labels = {} # Keep track of NACK labels
 
         # Arrays to keep track of packet order
-        self.received_order = []    # Order in which packets were received
-        self.upper_layer_order = []    # Order in which packets were sent to upper layer
+        self.received_order = []        # Order in which packets were received
+        self.upper_layer_order = []        # Order in which packets were sent to upper layer
 
         # In the __init__ method, add a new queue for timeout retransmissions with priority
-        self.retransmission_queue = Queue()    # Keep existing queue for NACK retransmissions
+        self.retransmission_queue = Queue()        # Keep existing queue for NACK retransmissions
         self.timeout_retransmission_queue = Queue()
 
     def log(self, message):
@@ -155,8 +158,8 @@ class SelectiveRepeatSimulator:
         self.received_out_of_order.clear()
         self.receiver_packet_objects.clear()
         self.packets_in_transit.clear()
-        self.processed_packets.clear()    # Reset processed packets tracker
-        self.animation_in_progress = False    # Reset animation tracker
+        self.processed_packets.clear()        # Reset processed packets tracker
+        self.animation_in_progress = False        # Reset animation tracker
         self.nack_labels.clear() # Clear NACK labels
         # Reset order tracking arrays
         self.received_order.clear()
@@ -207,112 +210,112 @@ class SelectiveRepeatSimulator:
 
     def draw_legend(self):
         # Legend box
-        legend_x = 1140
+        legend_x = 980
         legend_y = 100
-        legend_width = 290
+        legend_width = 321
         legend_height = 300
 
         # Draw legend box
         self.canvas.create_rectangle(legend_x, legend_y,
-                                    legend_x + legend_width,
-                                    legend_y + legend_height,
-                                    fill="#f5f5f5", outline="black")
+                                     legend_x + legend_width,
+                                     legend_y + legend_height,
+                                     fill="#f5f5f5", outline="black")
 
         # Legend Title
         self.canvas.create_text(legend_x + legend_width / 2, legend_y + 20,
-                                text="PACKET TYPES",
-                                font=("Arial", 14, "bold"))
+                                 text="PACKET TYPES",
+                                 font=("Arial", 14, "bold"))
 
         # Sample packets
         sample_width = 30
         sample_height = 25
-        text_offset = 110    # Text offset from left edge of legend
+        text_offset = 110        # Text offset from left edge of legend
 
         # Blue packet - Sender packet
         y_pos = legend_y + 60
         self.canvas.create_rectangle(legend_x + 20, y_pos,
-                                    legend_x + 20 + sample_width,
-                                    y_pos + sample_height,
-                                    fill="blue")
+                                     legend_x + 20 + sample_width,
+                                     y_pos + sample_height,
+                                     fill="blue")
         self.canvas.create_text(legend_x + 35, y_pos + sample_height / 2,
-                                text="P0", fill="white",
-                                font=("Arial", 9, "bold"))
+                                 text="P0", fill="white",
+                                 font=("Arial", 9, "bold"))
         self.canvas.create_text(legend_x + text_offset, y_pos + sample_height / 2,
-                                text="Sender packet",
-                                font=("Arial", 10),
-                                anchor="w")
+                                 text="Sender packet",
+                                 font=("Arial", 10),
+                                 anchor="w")
 
         # Orange packet - Retransmitted packet
         y_pos += 40
         self.canvas.create_rectangle(legend_x + 20, y_pos,
-                                    legend_x + 20 + sample_width,
-                                    y_pos + sample_height,
-                                    fill="orange")
+                                     legend_x + 20 + sample_width,
+                                     y_pos + sample_height,
+                                     fill="orange")
         self.canvas.create_text(legend_x + 35, y_pos + sample_height / 2,
-                                text="P0", fill="white",
-                                font=("Arial", 9, "bold"))
+                                 text="P0", fill="white",
+                                 font=("Arial", 9, "bold"))
         self.canvas.create_text(legend_x + text_offset, y_pos + sample_height / 2,
-                                text="Retransmitted packet",
-                                font=("Arial", 10),
-                                anchor="w")
+                                 text="Successfully retransmitted packet",
+                                 font=("Arial", 10),
+                                 anchor="w")
 
         # Green packet - Received in order
         y_pos += 40
         self.canvas.create_rectangle(legend_x + 20, y_pos,
-                                    legend_x + 20 + sample_width,
-                                    y_pos + sample_height,
-                                    fill="green")
+                                     legend_x + 20 + sample_width,
+                                     y_pos + sample_height,
+                                     fill="green")
         self.canvas.create_text(legend_x + 35, y_pos + sample_height / 2,
-                                text="P0", fill="white",
-                                font=("Arial", 9, "bold"))
+                                 text="P0", fill="white",
+                                 font=("Arial", 9, "bold"))
         self.canvas.create_text(legend_x + text_offset, y_pos + sample_height / 2,
-                                text="Received in order",
-                                font=("Arial", 10),
-                                anchor="w")
+                                 text="Received in order",
+                                 font=("Arial", 10),
+                                 anchor="w")
 
         # Yellow packet - Out of order
         y_pos += 40
         self.canvas.create_rectangle(legend_x + 20, y_pos,
-                                    legend_x + 20 + sample_width,
-                                    y_pos + sample_height,
-                                    fill="#c9a200")    # Dark yellow
+                                     legend_x + 20 + sample_width,
+                                     y_pos + sample_height,
+                                     fill="#c9a200")        # Dark yellow
         self.canvas.create_text(legend_x + 35, y_pos + sample_height / 2,
-                                text="P2", fill="white",
-                                font=("Arial", 9, "bold"))
+                                 text="P2", fill="white",
+                                 font=("Arial", 9, "bold"))
         self.canvas.create_text(legend_x + text_offset, y_pos + sample_height / 2,
-                                text="Received out of order",
-                                font=("Arial", 10),
-                                anchor="w")
+                                 text="Received out of order",
+                                 font=("Arial", 10),
+                                 anchor="w")
 
-        y_pos += 40    # Adjust position based on where your last legend item is
+        y_pos += 40        # Adjust position based on where your last legend item is
         self.canvas.create_rectangle(legend_x + 20, y_pos,
-                                    legend_x + 20 + sample_width,
-                                    y_pos + sample_height,
-                                    fill="red")
+                                     legend_x + 20 + sample_width,
+                                     y_pos + sample_height,
+                                     fill="red")
         self.canvas.create_text(legend_x + 35, y_pos + sample_height / 2,
-                                text="P0", fill="white",
-                                font=("Arial", 9, "bold"))
+                                 text="P0", fill="white",
+                                 font=("Arial", 9, "bold"))
         self.canvas.create_text(legend_x + text_offset, y_pos + sample_height / 2,
-                                text="Error packet (triggers NACK)",
-                                font=("Arial", 10),
-                                anchor="w")
+                                 text="Error packet (triggers NACK)",
+                                 font=("Arial", 10),
+                                 anchor="w")
 
         # Window indicator
         y_pos += 40
         self.canvas.create_rectangle(legend_x + 20, y_pos,
-                                    legend_x + 50,
-                                    y_pos + 30,
-                                    outline="#c9a200",
-                                    width=3)
+                                     legend_x + 50,
+                                     y_pos + 30,
+                                     outline="#c9a200",
+                                     width=3)
         self.canvas.create_text(legend_x + text_offset, y_pos + 15,
-                                text="Sliding window",
-                                font=("Arial", 10),
-                                anchor="w")
+                                 text="Sliding window",
+                                 font=("Arial", 10),
+                                 anchor="w")
 
     def draw_packet(self, x, y, text, color):
         rect = self.canvas.create_rectangle(x, y, x + PACKET_WIDTH, y + PACKET_HEIGHT, fill=color)
         label = self.canvas.create_text(x + 20, y + 15, text=text, fill="white", font=("Arial", 10, "bold"),
-                                        justify=['center'])
+                                         justify=['center'])
         return rect, label
 
     def get_packet_x(self, index, total_packets):
@@ -349,8 +352,8 @@ class SelectiveRepeatSimulator:
         self.canvas.update()
 
         total_distance = y_end - y_start
-        animation_duration = 1.0 * self.get_delay()  # Increased duration for slower speed
-        num_frames = 60  # More frames for smoother animation
+        animation_duration = 1.0 * self.get_delay()    # Increased duration for slower speed
+        num_frames = 60    # More frames for smoother animation
         delay_per_frame = animation_duration / num_frames
 
         dy = total_distance / num_frames
@@ -395,11 +398,15 @@ class SelectiveRepeatSimulator:
             in_order = packet_id == self.window_start_index
 
             # For out-of-order packet handling
-            if not in_order and packet_id not in self.received_out_of_order:
-                self.received_out_of_order.add(packet_id)
-                self.log(f"Out-of-order packet P{packet_id} received and buffered")
+            color = "green"
+            if not in_order:
+                color = "#c9a200"  # Yellow for out-of-order packets
+                if packet_id not in self.received_out_of_order:
+                    self.received_out_of_order.add(packet_id)
+                    self.log(f"Out-of-order packet P{packet_id} received and buffered")
+            elif is_retransmit:
+                color = "orange" # Orange for retransmitted packets
 
-            color = "green" if in_order else "#c9a200"  # Yellow for out-of-order packets
             self.canvas.itemconfig(rect, fill=color)
             self.canvas.itemconfig(label, text=f"P{packet_id} OK")
 
@@ -426,8 +433,10 @@ class SelectiveRepeatSimulator:
             if packet_id in self.sender_packet_objects and len(self.sender_packet_objects) > packet_id:
                 sender_objects = self.sender_packet_objects[packet_id]
                 if sender_objects and len(sender_objects) >= 2:
-                    self.canvas.delete(sender_objects[0])
-                    self.canvas.delete(sender_objects[1])
+                    sender_rect, sender_label = sender_objects
+                    if is_retransmit:
+                        self.canvas.itemconfig(sender_rect, fill="#c9a200") # Change sender side color to yellow
+                        self.canvas.itemconfig(sender_label, fill="black") # Ensure text is visible
 
             self.acked_packets.add(packet_id)
 
@@ -470,10 +479,10 @@ class SelectiveRepeatSimulator:
                     self.canvas.itemconfig(rect, fill="green")
                 self.log(f"Packet P{self.window_start_index} now in order")
 
-                # Add to upper layer order as it's now in order
-                self.upper_layer_order.append(self.window_start_index)
-                self.update_upper_layer_display()
-                self.log(f"Packet P{self.window_start_index} sent to upper layer")
+            # Add to upper layer order as it's now in order
+            self.upper_layer_order.append(self.window_start_index)
+            self.update_upper_layer_display()
+            self.log(f"Packet P{self.window_start_index} sent to upper layer")
 
             self.window_start_index += 1
             self.update_window_rect(self.window_start_index, window_size)
@@ -553,7 +562,7 @@ class SelectiveRepeatSimulator:
                         )
                     else:
                         self.canvas.itemconfig(self.timeout_labels[packet_id],
-                                               text=f"P{packet_id} timeout in: {remaining}s")
+                                                text=f"P{packet_id} timeout in: {remaining}s")
 
                     if elapsed >= 5 and packet_id in self.pending_timeout_retransmit:
                         if packet_id not in self.acked_packets:
@@ -626,7 +635,7 @@ class SelectiveRepeatSimulator:
 
                 # Process one packet at a time
                 dropped = packet_id in self.packets_to_drop
-                self.animate_packet(packet_id, dropped)
+                self.animate_packet(packet_id, dropped, is_retransmit=(packet_id in self.retransmission_queue.queue or packet_id in [item for item in self.timeout_retransmission_queue.queue]))
 
                 # Wait for this animation to complete before sending the next packet
                 while self.animation_in_progress or self.packets_in_transit:
@@ -667,31 +676,38 @@ class SelectiveRepeatSimulator:
                         self.log(
                             f"Warning: Invalid packet number '{item}'. Must be between 0 and {self.num_packets.get() - 1}."
                         )
-            return sorted(list(set(packets)))
+            return packets
         except ValueError:
-            self.log("Error: Invalid input for packets to drop. Please use comma-separated numbers.")
+            self.log("Error: Invalid input for packet numbers. Please use comma-separated integers.")
             return []
 
     def start_simulation(self):
-        if self.running_thread is None:
+        if self.running_thread is None or not self.running_thread.is_alive():
+            self.packets_to_drop = self.parse_drop_packets()
             self.reset_simulation()
             self.draw_layout()
-            self.packets_to_drop = self.parse_drop_packets()
             num_packets = self.num_packets.get()
+            # Initialize sender packets visually
+            self.sender_packet_objects = []
+            start_x = self.get_packet_x(0, num_packets)
             for i in range(num_packets):
-                x = self.get_packet_x(i, num_packets)
+                x = start_x + i * (PACKET_WIDTH + PACKET_SPACING)
                 y = SENDER_CENTER_Y
                 rect, label = self.draw_packet(x, y, f"P{i}", "blue")
                 self.sender_packet_objects.append((rect, label))
-            self.window_start_index = 0
-            self.update_window_rect(self.window_start_index, self.window_size_var.get())
+
             self.running_thread = Thread(target=self.simulate_packets_sliding_window, args=(num_packets,))
-            self.running_thread.daemon = True
             self.running_thread.start()
-        else:
-            self.log("Simulation is already running.")
+            # Removed the line that disabled the start button
+            self.pause_button.config(state=tk.NORMAL)
+            self.reset_button.config(state=tk.NORMAL)
+
+    def on_closing(self):
+        self.running_thread = None
+        self.root.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
     simulator = SelectiveRepeatSimulator(root)
+    root.protocol("WM_DELETE_WINDOW", simulator.on_closing)
     root.mainloop()
