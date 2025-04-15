@@ -9,7 +9,6 @@ PACKET_HEIGHT = 30
 PACKET_SPACING = 30
 DELAY = 0.5
 
-
 SENDER_Y1, SENDER_Y2 = 100, 180
 RECEIVER_Y1, RECEIVER_Y2 = 300, 380
 SENDER_CENTER_Y = (SENDER_Y1 + SENDER_Y2 - PACKET_HEIGHT) // 2
@@ -21,10 +20,10 @@ class SelectiveRepeatSimulator:
         self.root = root
         self.root.title("Selective Repeat Protocol Simulation")
 
-        top_sentence = tk.Label(root, text="Selective Repeat Protocol Simulation", font=("Arial", 14))
+        top_sentence = tk.Label(root, text="Selective Repeat Protocol Simulation", font=("Arial", 12))
         top_sentence.pack(pady=2)
 
-        self.canvas = tk.Canvas(root, width=1400, height=500, bg="white")
+        self.canvas = tk.Canvas(root, width=1400, height=400, bg="white")
         self.canvas.pack()
 
         layout_frame = tk.Frame(root)
@@ -88,6 +87,7 @@ class SelectiveRepeatSimulator:
         self.sender_packet_objects = []
         self.running_thread = None
         self.paused = False
+        self.pause_button.config(text="Pause", state=tk.DISABLED)
         self.window_rect = None
         self.receiver_window_rect = None
         self.timeout_dropped_packets = {}
@@ -144,12 +144,15 @@ class SelectiveRepeatSimulator:
         return speed_map.get(self.speed_var.get(), 1.0)
 
     def reset_simulation(self):
+        if self.running_thread and self.running_thread.is_alive():
+            self.running_thread = None
         self.canvas.delete("all")
         self.packet_rects.clear()
         self.sender_packet_objects.clear()
         self.running_thread = None
         self.paused = False
-        self.pause_button.config(text="Pause")
+        self.pause_button.config(text="Pause", state=tk.DISABLED)
+        self.send_button.config(text="Start", state=tk.NORMAL)
         self.window_start_index = 0
         self.window_rect = None
         self.receiver_window_rect = None
@@ -192,8 +195,9 @@ class SelectiveRepeatSimulator:
                 pass
 
     def toggle_pause(self):
-        self.paused = not self.paused
-        self.pause_button.config(text="Resume" if self.paused else "Pause")
+        if self.running_thread and self.running_thread.is_alive():
+            self.paused = not self.paused
+            self.pause_button.config(text="Resume" if self.paused else "Pause")
 
     def wait_if_paused(self):
         while self.paused:
@@ -213,7 +217,7 @@ class SelectiveRepeatSimulator:
         # Legend box
         legend_x = 980
         legend_y = 100
-        legend_width = 321
+        legend_width = 319
         legend_height = 300
 
         # Draw legend box
@@ -388,9 +392,15 @@ class SelectiveRepeatSimulator:
             self.canvas.delete(rect)
             self.canvas.delete(label)
 
-            # Queue for immediate retransmission
-            self.retransmission_queue.put(packet_id)
-            self.log(f"NACK received for P{packet_id}, queued for retransmission")
+            # Queue for immediate retransmission if not already queued
+            if packet_id not in self.retransmission_queue.queue and packet_id not in [item for item in self.timeout_retransmission_queue.queue] and packet_id not in self.acked_packets:
+                self.retransmission_queue.put(packet_id)
+                self.log(f"NACK received for P{packet_id}, queued for retransmission")
+
+            # Mark as pending retransmission to avoid timeout triggering immediately
+            if packet_id not in self.pending_timeout_retransmit:
+                self.pending_timeout_retransmit.add(packet_id)
+
         else:
             # Add this packet to the received order list and update display
             self.received_order.append(packet_id)
@@ -401,7 +411,7 @@ class SelectiveRepeatSimulator:
             # For out-of-order packet handling
             color = "green"
             if not in_order:
-                color = "#c9a200"  # Yellow for out-of-order packets
+                color = "#c9a200" # Yellow for out-of-order packets
                 if packet_id not in self.received_out_of_order:
                     self.received_out_of_order.add(packet_id)
                     self.log(f"Out-of-order packet P{packet_id} received and buffered")
@@ -574,8 +584,9 @@ class SelectiveRepeatSimulator:
                                 self.canvas.delete(self.timeout_labels[packet_id])
                                 del self.timeout_labels[packet_id]
 
-                            # Queue the packet for high-priority retransmission
-                            self.timeout_retransmission_queue.put(packet_id)
+                            # Queue the packet for high-priority retransmission only if not already in the other queue
+                            if packet_id not in self.retransmission_queue.queue and packet_id not in [item for item in self.timeout_retransmission_queue.queue]:
+                                self.timeout_retransmission_queue.put(packet_id)
 
                             # Remove from pending timeout list to prevent multiple retransmissions
                             if packet_id in self.pending_timeout_retransmit:
@@ -593,9 +604,8 @@ class SelectiveRepeatSimulator:
                             time.sleep(1.0) # Reduced delay
 
                 time.sleep(0.5) # Increased delay for checking timeouts
-
         Thread(target=watcher, daemon=True).start()
-
+        
     def is_packet_in_current_window(self, packet_id):
         """Check if a packet is within the current sliding window"""
         window_end = min(self.window_start_index + self.window_size_var.get(), self.num_packets.get())
@@ -669,24 +679,27 @@ class SelectiveRepeatSimulator:
             for item in raw_input.split(','):
                 item = item.strip()
                 if item:
-                    packet_id = int(item)
-                    if 0 <= packet_id < self.num_packets.get():
-                        packets.append(packet_id)
-                        self.log(f"Packet P{packet_id} will be dropped, triggering NACK.")
-                    else:
-                        self.log(
-                            f"Warning: Invalid packet number '{item}'. Must be between 0 and {self.num_packets.get() - 1}."
-                        )
+                    try:
+                        packet_id = int(item)
+                        if 0 <= packet_id < self.num_packets.get():
+                            packets.append(packet_id)
+                            self.log(f"Packet P{packet_id} will be dropped, triggering NACK.")
+                        else:
+                            self.log(
+                                f"Warning: Invalid packet number '{item}'. Must be between 0 and {self.num_packets.get() - 1}."
+                            )
+                    except ValueError:
+                        self.log(f"Warning: Invalid input '{item}'. Please use comma-separated integers.")
             return packets
-        except ValueError:
-            self.log("Error: Invalid input for packet numbers. Please use comma-separated integers.")
+        except Exception as e:
+            self.log(f"Error parsing drop packets: {e}")
             return []
 
     def start_simulation(self):
         if self.running_thread is None or not self.running_thread.is_alive():
-            self.packets_to_drop = self.parse_drop_packets()
             self.reset_simulation()
             self.draw_layout()
+            self.packets_to_drop = self.parse_drop_packets()
             num_packets = self.num_packets.get()
             # Initialize sender packets visually
             self.sender_packet_objects = []
@@ -699,9 +712,11 @@ class SelectiveRepeatSimulator:
 
             self.running_thread = Thread(target=self.simulate_packets_sliding_window, args=(num_packets,))
             self.running_thread.start()
-            # Removed the line that disabled the start button
+            self.send_button.config(text="Restart", state=tk.NORMAL)
             self.pause_button.config(state=tk.NORMAL)
             self.reset_button.config(state=tk.NORMAL)
+        else:
+            self.log("Simulation is already running. Press 'Reset' to start a new one.")
 
     def on_closing(self):
         self.running_thread = None
