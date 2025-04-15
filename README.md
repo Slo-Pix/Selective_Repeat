@@ -71,8 +71,15 @@ Refer to step 2 to convert it to .exe
      ```bash
      pyinstaller --onefile --icon="PATH to icon image" --noconsole main.py 
      ```
+
+   **important** - 
+   - icon image should be of extension .ico 
+   - assets/ directory contains one example icon.ico file 
+   - replace "PATH to icon image" with the path to icon.ico 
+
      (--icon set icon image (optional) ; --noconsole to not display terminal while running gui)
-     The executable will be located in the `dist` folder.
+   
+   - The executable will be located in the `dist` folder.
 
 ---
 
