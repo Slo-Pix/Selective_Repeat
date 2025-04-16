@@ -1,4 +1,4 @@
--- Implementation of Selective Repeat Protocol --
+--> Implementation of Selective Repeat Protocol <--
 
 
 ## Overview
@@ -16,19 +16,6 @@
 
 ---
 
-## Installation Steps
-
-1. **Clone or Download the Repository**:
-   - Clone the repository using Git:
-     ```bash
-     git clone https://github.com/your-repo/selective-repeat-protocol.git
-     ```
-   - Alternatively, download the ZIP file and extract it.
-
-2. **Navigate to the Project Directory**:
-
----
-
 ## Path Setting
 
 1. **For Windows**:
@@ -43,10 +30,26 @@
 
 ---
 
+## Installation Steps
+
+1. **Clone or Download the Repository**:
+   - Clone the repository using Git:
+     ```bash
+     git clone https://github.com/your-repo/selective-repeat-protocol.git
+     ```
+   - Alternatively, download the ZIP file and extract it.
+
+2. **Navigate to the Project Directory**:
+
+---
+
 ## Execution Steps 
 
-The project can be run directly as a script which in turn opens a GUI 
-Refer to step 2 to convert it to .exe
+- The project can be run directly as a script which in turn opens a GUI (STEP 1)
+
+- If you want an executable -
+   Refer to STEP 2 to convert it to .exe
+
 
 1. **Run the Main Script**:
 
@@ -92,6 +95,10 @@ Refer to step 2 to convert it to .exe
 
 3. **Execution Errors**:
    - 🛠️ Ensure all files, including `icon.ico`, are in the correct paths.
+
+---
+
+- Incase of proper functionality not being implemented run the code ATLEAST TWICE using the restart or pause/reset buttons 
 
 ---
 
