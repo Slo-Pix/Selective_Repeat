@@ -112,12 +112,20 @@ eg - to adjust the canvas height and width make changes in line no. 26 of code
 ## Folder Structure (for easy navigation)
 ```
 Selective_Repeat_Protocol/
-|-- assets/                  # Contains icons and other resources
+|-- assets/                   # Contains icons and other resources
 |   |-- icon.ico
-|-- src/                     # Source files
-|   |-- main.py              # Main script
-|-- README.md                # Readme file
-|-- writeup.pdf              # 2 page writeup
+|
+|-- src/                     
+|   |script/
+|   |  |-- main.py            # Main script / code
+|   |  
+|   |executable/ 
+|      |-- build/             # Dependencies/packages
+|      |-- dist/main.exe      # Executable file
+|
+|-- README.md                 # Readme file
+|
+|-- writeup.pdf               # 2 page writeup
 ```
 
 ## Additional Notes
