@@ -1,4 +1,4 @@
---> Implementation of Selective Repeat Protocol <--
+## Implementation of Selective Repeat Protocol
 
 
 ## Overview
