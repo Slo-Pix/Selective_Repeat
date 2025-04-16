@@ -7,6 +7,16 @@
 
 ---
 
+## Imp
+
+- Incase of proper functionality not being implemented run the code ATLEAST TWICE using the restart or pause/reset buttons 
+
+- The simulation design and layout is not dynamic (it doesn't adjust to the screen resolution on its own) . Therefore, if you are facing any issue related to components not getting displayed properly or out of screen manually adjust the height and width of the component 
+
+eg - to adjust the canvas height and width make changes in line no. 26 of code
+
+---
+
 ## Prerequisites
 
 1. **Python**: 🐍 Ensure Python 3.8 or later is installed on your system. Download from [Python.org](https://www.python.org/).
@@ -98,9 +108,6 @@
 
 ---
 
-- Incase of proper functionality not being implemented run the code ATLEAST TWICE using the restart or pause/reset buttons 
-
----
 
 ## Folder Structure (for easy navigation)
 ```
